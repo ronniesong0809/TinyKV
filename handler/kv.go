@@ -29,6 +29,9 @@ func SetValue(c *gin.Context) {
 		return
 	}
 	ttlDuration := time.Duration(json.TTL) * time.Second
+	if json.TTL == 0 {
+		ttlDuration = 1 * time.Minute
+	}
 	store.Set(key, json.Value, ttlDuration)
 	c.JSON(http.StatusOK, gin.H{"status": "set"})
 }
