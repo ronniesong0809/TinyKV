@@ -12,7 +12,7 @@ type KVStore struct {
 }
 
 type valueWithTTL struct {
-	Value      string
+	Value      interface{}
 	Expiration time.Time
 }
 
@@ -20,21 +20,21 @@ var store = KVStore{
 	data: make(map[string]valueWithTTL),
 }
 
-func Get(key string) (string, error) {
+func Get(key string) (interface{}, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
 	value, exists := store.data[key]
 	if !exists {
-		return "", errors.New("key not found")
+		return nil, errors.New("key not found")
 	}
 	if value.Expiration.Before(time.Now()) {
 		delete(store.data, key)
-		return "", errors.New("key expired")
+		return nil, errors.New("key expired")
 	}
 	return value.Value, nil
 }
 
-func Set(key, value string, ttl time.Duration) {
+func Set(key string, value interface{}, ttl time.Duration) {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	store.data[key] = valueWithTTL{
@@ -43,7 +43,7 @@ func Set(key, value string, ttl time.Duration) {
 	}
 }
 
-func Update(key, value string, ttl time.Duration) error {
+func Update(key string, value interface{}, ttl time.Duration) error {
 	store.mu.Lock()
 	defer store.mu.Unlock()
 	if _, exists := store.data[key]; !exists {

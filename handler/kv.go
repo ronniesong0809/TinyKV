@@ -21,7 +21,7 @@ func GetValue(c *gin.Context) {
 func SetValue(c *gin.Context) {
 	key := c.Param("key")
 	var json struct {
-		Value string        `json:"value" binding:"required"`
+		Value interface{}   `json:"value" binding:"required"`
 		TTL   time.Duration `json:"ttl"`
 	}
 	if err := c.ShouldBindJSON(&json); err != nil {
@@ -36,7 +36,7 @@ func SetValue(c *gin.Context) {
 func UpdateValue(c *gin.Context) {
 	key := c.Param("key")
 	var json struct {
-		Value string        `json:"value" binding:"required"`
+		Value interface{}   `json:"value" binding:"required"`
 		TTL   time.Duration `json:"ttl"`
 	}
 	if err := c.ShouldBindJSON(&json); err != nil {
