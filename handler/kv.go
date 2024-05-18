@@ -28,7 +28,8 @@ func SetValue(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	store.Set(key, json.Value, json.TTL)
+	ttlDuration := time.Duration(json.TTL) * time.Second
+	store.Set(key, json.Value, ttlDuration)
 	c.JSON(http.StatusOK, gin.H{"status": "set"})
 }
 
@@ -42,7 +43,8 @@ func UpdateValue(c *gin.Context) {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	err := store.Update(key, json.Value, json.TTL)
+	ttlDuration := time.Duration(json.TTL) * time.Second
+	err := store.Update(key, json.Value, ttlDuration)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
