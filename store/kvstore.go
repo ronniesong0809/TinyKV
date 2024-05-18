@@ -20,18 +20,19 @@ var store = KVStore{
 	data: make(map[string]valueWithTTL),
 }
 
-func Get(key string) (interface{}, error) {
+func Get(key string) (interface{}, time.Duration, error) {
 	store.mu.RLock()
 	defer store.mu.RUnlock()
 	value, exists := store.data[key]
 	if !exists {
-		return nil, errors.New("key not found")
+		return nil, 0, errors.New("key not found")
 	}
 	if value.Expiration.Before(time.Now()) {
 		delete(store.data, key)
-		return nil, errors.New("key expired")
+		return nil, 0, errors.New("key expired")
 	}
-	return value.Value, nil
+	expirationTime := value.Expiration.Sub(time.Now())
+	return value.Value, expirationTime, nil
 }
 
 func Set(key string, value interface{}, ttl time.Duration) {

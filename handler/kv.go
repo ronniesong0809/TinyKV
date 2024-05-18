@@ -10,12 +10,12 @@ import (
 
 func GetValue(c *gin.Context) {
 	key := c.Param("key")
-	value, err := store.Get(key)
+	value, expirationTime, err := store.Get(key)
 	if err != nil {
 		c.JSON(http.StatusNotFound, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"value": value})
+	c.JSON(http.StatusOK, gin.H{"value": value, "ttlLeft": expirationTime.Seconds()})
 }
 
 func SetValue(c *gin.Context) {
